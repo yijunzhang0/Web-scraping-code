@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 import concurrent.futures
-# !pip install requests
-# !pip install bs4 
 import re
 from datetime import date, datetime, timedelta
 import os
@@ -1594,3 +1592,4 @@ if __name__ == '__main__':
     
 
     
+
