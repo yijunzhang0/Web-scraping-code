@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 import concurrent.futures
-# !pip install requests
-# !pip install bs4 
 import re
 from datetime import date, datetime, timedelta
 import os
@@ -519,4 +517,5 @@ if __name__ == '__main__':
     scrape_award(tconst)
     t2 = datetime.now()
     duration = t2 - t1
+
     print(f'The award scraping for {tconst} took {round(duration.total_seconds(), 2)} seconds\n')
