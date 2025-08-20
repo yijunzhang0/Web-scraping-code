@@ -1017,9 +1017,6 @@ def scrape_main_subsec(driver, section, sub_sec, list_to_append):
         
     
 
-    #return num_elm # , list_to_append
-
-
 
 ### Functions to scrape the blocks on the main page ###
 def scrape_watchlist(driver, tconst, list_watchlist):
@@ -1595,4 +1592,5 @@ if __name__ == '__main__':
 
             
     
+
     
