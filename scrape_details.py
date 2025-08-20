@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 import concurrent.futures
-# !pip install requests
-# !pip install bs4 
 import re
 from datetime import date, datetime, timedelta
 import os
@@ -502,9 +500,10 @@ def scrape_detail_page(tconst, page):
 if __name__ == '__main__':
 
     tconst = 'tt5687612'
-    page = 'companycredits'
+    page = 'companycredits' # for release dates info, replace with 'releaseinfo'
     t1 = datetime.now()
     scrape_detail_page(tconst, page)
     t2 = datetime.now()
     duration = t2 - t1
+
     print(f'The {page} scraping for {tconst} took {round(duration.total_seconds(), 2)} seconds\n') 
