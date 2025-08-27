@@ -1,6 +1,4 @@
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 import re
 from datetime import date, timedelta, datetime
 import os
@@ -41,7 +39,7 @@ def check_recent_file(t, folder, directory):
     True if there is a recent file and False otherwise. '''
     
     today = date.today()
-    two_day_ago = today - timedelta(days=2)
+    two_day_ago = today - timedelta(days=2) # adjust by need
     # Escape special characters in t
     escaped_t = re.escape(t)
     
@@ -59,8 +57,8 @@ def check_recent_file(t, folder, directory):
             file_date_str = match.group(1)
             file_date = datetime.strptime(file_date_str, '%Y-%m-%d').date()
             if two_day_ago <= file_date <= today:
-                return True  # Recent file found
-    return False  # No recent file found
+                return True  
+    return False  
 
 
 def scrape_justwatch_href_selenium(replace_str='new', platform='netflix'):
@@ -74,7 +72,7 @@ def scrape_justwatch_href_selenium(replace_str='new', platform='netflix'):
       'new' to collect what is new to the streaming platforms.
 
     platform: str.
-      Default is 'netflix'. Can be changed to other platforms. This platform's href will be appended manually.
+      Default is 'netflix'. Can be changed to other platforms. This platform's href needs to be appended manually.
         
     
     Returns:
@@ -83,9 +81,6 @@ def scrape_justwatch_href_selenium(replace_str='new', platform='netflix'):
       A csv file is saved for each platform with the corresponding hrefs.
     '''
 
-    # if os.path.exists('justwatch_href.csv'):
-    #     print('URLs already retrieved!')
-    #     return
     current_path = os.getcwd()
     # define the subfolder name
     subfolder = replace_str[0].upper() + replace_str[1:] + '_Content'
@@ -95,13 +90,13 @@ def scrape_justwatch_href_selenium(replace_str='new', platform='netflix'):
     if not os.path.exists(subfolder_path):
         os.makedirs(subfolder_path)
 
-    if check_recent_file('justwatch_href', replace_str, subfolder_path):
+    if check_recent_file('justwatch_href', None, subfolder_path):
        print('URLs already retrieved!')
        return
     
     options = Options()
     options.set_preference('intl.accept_languages', 'en-US')
-    options.binary_location = 'C:/Program Files/Mozilla Firefox/firefox.exe'
+    options.binary_location = 'C:/Program Files/Mozilla Firefox/firefox.exe' # Replace with the path of Firebox!
 
     # user agent
     software_names = [SoftwareName.FIREFOX.value, SoftwareName.CHROME.value]
@@ -110,8 +105,7 @@ def scrape_justwatch_href_selenium(replace_str='new', platform='netflix'):
     user_agent = user_agent_rotator.get_random_user_agent()
     options.add_argument('--user-agent={}'.format(user_agent))
 
-    #initiate driver
-    PATH = 'C:/Users/zhang/Downloads/geckodriver-v0.36.0-win32/geckodriver.exe'
+    PATH = 'C:/Users/zhang/Downloads/geckodriver-v0.36.0-win32/geckodriver.exe' # Replace with the path of geckodriver!
     service = Service(executable_path=PATH)
     driver = webdriver.Firefox(options=options, service=service)
     driver.maximize_window()
@@ -130,9 +124,9 @@ def scrape_justwatch_href_selenium(replace_str='new', platform='netflix'):
         hrefs.append(p.find_element(By.TAG_NAME, 'a').get_attribute('href'))
 
     hrefs.append(f'https://www.justwatch.com/us/provider/{platform}/new')
-    df = pd.DataFrame({'href_justwatch':hrefs})###.to_csv('justwatch_href.csv', index=False)
+    df = pd.DataFrame({'href_justwatch':hrefs})
 
-    output_file_name = 'justwatch_href_' + replace_str + str(date.today()) + '.csv'
+    output_file_name = 'justwatch_href_' + str(date.today()) + '.csv'
     output_file_path = os.path.join(subfolder_path, output_file_name)
     df.to_csv(output_file_path, index=False) 
 
@@ -180,7 +174,7 @@ def scrape_justwatch_content_change(replace_str, url):
     
     options = Options()
     options.set_preference('intl.accept_languages', 'en-US')
-    options.binary_location = 'C:/Program Files/Mozilla Firefox/firefox.exe'
+    options.binary_location = 'C:/Program Files/Mozilla Firefox/firefox.exe' # Replace with the path of Firefox!
 
     # user agent
     software_names = [SoftwareName.FIREFOX.value, SoftwareName.CHROME.value]
@@ -189,8 +183,7 @@ def scrape_justwatch_content_change(replace_str, url):
     user_agent = user_agent_rotator.get_random_user_agent()
     options.add_argument('--user-agent={}'.format(user_agent))
 
-    #initiate driver
-    PATH = 'C:/Users/zhang/Downloads/geckodriver-v0.36.0-win32/geckodriver.exe'
+    PATH = 'C:/Users/zhang/Downloads/geckodriver-v0.36.0-win32/geckodriver.exe' # Replace with the path of geckodriver!
     service = Service(executable_path=PATH)
     driver = webdriver.Firefox(options=options, service=service)
     driver.maximize_window()
@@ -198,16 +191,16 @@ def scrape_justwatch_content_change(replace_str, url):
     driver.get(url) 
     driver.implicitly_wait(30)    
 
-    ######################################################
-    # Scroll the page and wait for it to load dynamiclly #
-    ######################################################
+    ##########################################################
+    ### Scroll the page and wait for it to load dynamiclly ###
+    ##########################################################
     scroll_count = 15 # Scroll how many times
      
     for _ in range(scroll_count):
         driver.execute_script("window.scrollBy(0, arguments[0]);", 1600)
         time.sleep(3)    
         try:
-            end_of_page_tag = driver.find_element(By.TAG_NAME, "h3").text
+            end_of_page_tag = driver.find_element(By.TAG_NAME, 'h3').text
             if "You've reached the end of the list!" in end_of_page_tag or "Sorry, nothing to see here!" in end_of_page_tag:
                 print('Reached the end of the list!')
                 break
@@ -215,31 +208,47 @@ def scrape_justwatch_content_change(replace_str, url):
             pass    
 
     dates= []
-    title_hrefs = [] # types movie or tv show dealt with later after saving the files
+    title_hrefs = [] 
 
-    ####################################
-    ### Scrape with selenium and BS4 ###
-    ####################################
+    ############################
+    ### Scrape with selenium ###
+    ############################
 
     try:
         blocks = WebDriverWait(driver, 60).until(EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, 'timeline__timeframe timeline__timeframe')]")))
-        # each block is a title update
+        # each block is a date
         for x in blocks:
-            try:
-                # the update date separated by '--'
-                change_day = x.get_attribute('class').split('--')[1]
-            except NoSuchElementException:
-                change_day = None
-            
-            # For each day, retrieve all the (hidden) contents from the inner HTML of this element 
-            href_source = x.get_attribute('innerHTML')
-            soup = BeautifulSoup(href_source, 'html.parser')
-            num = len(soup.find_all('div', {'class':'horizontal-title-list__item'}))
-            print(f'Updated {num} titles on {change_day}')
-            dates.extend([change_day]*num)
+            # the update date separated by '--'
+            change_day = x.get_attribute('class').split('--')[1]
 
-            for elm in soup.find_all('div', {'class':'horizontal-title-list__item'}):
-                title_hrefs.append(elm.find('a').get('href'))
+            # scroll the date block into view
+            driver.execute_script("arguments[0].scrollIntoView(true);", x)
+
+            # For each day, retrieve all the (hidden) contents
+            # find the scrollable container
+            container = x.find_element(By.CSS_SELECTOR, 'div.hidden-horizontal-scrollbar__items')
+
+            while True:
+                # scroll right
+                driver.execute_script("arguments[0].scrollLeft += 500;", container)
+                time.sleep(1)
+
+                # check if the 'end' nav element is still visible
+                # First there is only the 'end'. Once start strolling, 'start' will appear. Once all is loaded, 'end' disappears.
+                try:
+                    end_marker = x.find_element(By.CSS_SELECTOR, 'span.hidden-horizontal-scrollbar__nav.hidden-horizontal-scrollbar__nav--end')
+                    if end_marker:
+                        # still visible, keep scrolling
+                        continue
+                except NoSuchElementException:
+                    # print(f'All updates on {change_day} loaded')
+                    break
+                    
+            items = container.find_elements(By.XPATH, "./div[@class='horizontal-title-list__item']/a")
+            dates.extend([change_day]*len(items))
+            print(f'Updated {len(items)} titles on {change_day}')
+            for item in items:
+                title_hrefs.append(item.get_attribute("href"))
 
         df = pd.DataFrame({'date': dates, 'href': title_hrefs})
         output_file_name = platform + '_' + replace_str + '_' + str(date.today()) + '.csv'
@@ -256,7 +265,6 @@ def scrape_justwatch_content_change(replace_str, url):
 
 
 
-
 if __name__ == '__main__':
 
     ####################################################################
@@ -269,7 +277,7 @@ if __name__ == '__main__':
     current_path = os.getcwd()
     subfolder = 'New_Content'
     folder = os.path.join(current_path, subfolder)
-    prefix = 'justwatch_href_new'
+    prefix = 'justwatch_href'
 
     # Find the latest file that contains all the hrefs of platforms on Justwatch
     latest_file = max(
@@ -282,8 +290,8 @@ if __name__ == '__main__':
     df = pd.read_csv(latest_path)
 
     # To illustrate, we can pick 2 platforms that do not have many new contents
-    # Of course, to collect the full info, we would run:
-    # hrefs= df['href_justwatch']
+    # To collect the full info, we would run:
+    # urls = df['href_justwatch']
     urls = df['href_justwatch'][38:40]
     for i, url in enumerate(urls):
         print(f'Navigating to {url}...')
