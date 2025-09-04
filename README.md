@@ -24,7 +24,7 @@ One output file is saved under the _Release_ folder (will be created if not exis
 - _tconst_release_YYYY-MM-DD.csv_: country of the release, date and location.
 
 ### Complete Workflow
-The script `scrape_imdb_titles.py` performs an automated process. First, check the main pages whether titles have streaming options. If not, the titles are skipped. If yes, collect relevant info on the main page such as the box office and metascore. To keep track, an output file is always saved even if the titles in the batch do not have streaming options.\
+The script `scrape_imdb_titles.py` performs a semi-automated process. First, check the main pages whether titles have streaming options. If not, the titles are skipped. If yes, collect relevant info on the main page such as the box office and metascore. \
 Second, for titles available for streaming, collect and save the award info, release info and company credits from the corresponding pages. The funcs are in parallel using `concurrent.futures.ThreadPoolExecutor`.
 
 # Collect data from Justwatch
