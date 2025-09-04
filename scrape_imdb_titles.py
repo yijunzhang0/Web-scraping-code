@@ -1180,7 +1180,6 @@ def scrape_view(tconst):
     # Technical specs section on the main page
     colors = [] 
     soundmix = [] 
-    aspect_ratios = [] # Aspect ratio
 
     stars = [] # main actors and actresses
     air_dates = [] # the date episodes were aired
@@ -1192,7 +1191,7 @@ def scrape_view(tconst):
                 'num_photo': num_photos, 'num_video': num_videos, 'origin': origin_countries, 'language': languages,
                 'filming_loc': filming_locs, 'budget':budgets, 'open_boxoffice_america': open_americas,
                 'gross_boxoffice_america': gross_americas, 'gross_boxoffice_world':gross_intls, 'color':colors,
-                'soundmix': soundmix, 'aspect_ratio':aspect_ratios, 'star':stars, 'air_date': air_dates }
+                'soundmix': soundmix, 'star':stars, 'air_date': air_dates }
 
     
     driver.get(url) 
@@ -1313,7 +1312,6 @@ def scrape_view(tconst):
         scrape_main_subsec(driver, 'boxoffice', 'cumulativeworldwidegross', gross_intls)
         scrape_main_subsec(driver, 'techspecs', 'color', colors)
         scrape_main_subsec(driver, 'techspecs', 'soundmix', soundmix)
-        scrape_main_subsec(driver, 'techspecs', 'aspectratio', aspect_ratios)
 
         #######################
         ### The stars block ###
@@ -1564,8 +1562,6 @@ if __name__ == '__main__':
 
             # To save time, do not scrape the title if there is no streaming option
             title_ids_detail = list(set(title_ids) - set(no_stream_tconsts))
-            # print(title_ids_detail) if title_ids_detail else print('No title has streaming option')
-
 
             if title_ids_detail:
                 print(title_ids_detail)
@@ -1592,4 +1588,5 @@ if __name__ == '__main__':
     
 
     
+
 
